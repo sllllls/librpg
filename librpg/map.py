@@ -14,7 +14,7 @@ from librpg.locals import *
 from librpg.movement import Step
 
 
-class Map(object):
+class MapController(object):
 
     # Read-Only Attributes:
     # map_view - MapView (View component of MVC)
@@ -25,6 +25,7 @@ class Map(object):
 
     def __init__(self, map_model, local_state=None):
         self.map_model = map_model
+        self.map_model.controller = self
         self.map_model.initialize(local_state)
         self.map_view = MapView(self.map_model)
 
@@ -39,9 +40,9 @@ class Map(object):
 
         map_view_draw()
 
-        clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()
         while map_model.keep_going:
-            clock.tick(Map.FPS)
+            self.clock.tick(MapController.FPS)
 
             if map_model.pause_delay > 0:
                 map_model.pause_delay -= 1
@@ -70,7 +71,7 @@ class Map(object):
                 self.map_model.leave()
             elif event.type == KEYDOWN:
                 if not self.map_model.current_message:
-                    direction = Map.KEY_TO_DIRECTION.get(event.key)
+                    direction = MapController.KEY_TO_DIRECTION.get(event.key)
                     if direction is not None and\
                        not direction in self.map_model.party_movement:
                         self.party_movement_append(direction)
@@ -79,14 +80,14 @@ class Map(object):
                     elif event.key == K_ESCAPE:
                         self.map_model.leave()
                 else:
-                    direction = Map.KEY_TO_DIRECTION.get(event.key)
+                    direction = MapController.KEY_TO_DIRECTION.get(event.key)
                     if direction is not None and\
                        not direction in self.map_model.party_movement:
                         self.party_movement_append(direction)
                     elif event.key == K_SPACE or event.key == K_RETURN:
                         self.map_model.current_message = None
             elif event.type == KEYUP:
-                direction = Map.KEY_TO_DIRECTION.get(event.key)
+                direction = MapController.KEY_TO_DIRECTION.get(event.key)
                 if direction is not None and\
                    direction in self.map_model.party_movement:
                     self.party_movement_remove(direction)
@@ -112,12 +113,20 @@ class Map(object):
                        get_pos(party_avatar.position).above:
                 obj.collide_with_party(party_avatar, party_avatar.facing)
 
+    def sync_movement(self, objects):
+
+        while any([o.scheduled_movement for o in objects]):
+            self.clock.tick(MapController.FPS)
+            for o in objects:
+                o.flow()
+            self.map_view.draw()
+
 
 class MapModel(object):
 
     """
     party: Party (read-only)
-    Active Party on this Map.
+    Active Party on this map.
 
     party_avatar: PartyAvatar (read-only)
     MapObject representation of the active Party.
@@ -417,6 +426,9 @@ class MapModel(object):
         result += '+' + '-' * self.width + '+\n'
         return result
 
+    def sync_movement(self, objects):
+    
+        self.controller.sync_movement(objects)
 
 class ObjectCell(object):
 
