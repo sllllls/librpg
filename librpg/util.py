@@ -6,12 +6,13 @@ purposes.
 from librpg.locals import *
 from librpg.config import *
 
+
 class Position(object):
 
     """
     Represents a pair (x, y) of 2D coordinates. It considers that the
     x axis goes from left to right and the y axis goes downwards.
-    
+
     :attr:`x`
         Horizontal position.
 
@@ -92,7 +93,7 @@ class Position(object):
         elif i == 1:
             return self.y
         else:
-            raise IndexError, 'Position is only 2 dimensional'
+            raise IndexError('Position is only 2 dimensional')
 
     def __setitem__(self, i, value):
         if i == 0:
@@ -100,17 +101,17 @@ class Position(object):
         elif i == 1:
             self.y = value
         else:
-            raise IndexError, 'Position is only 2 dimensional'
+            raise IndexError('Position is only 2 dimensional')
 
 
 class Matrix(object):
 
     """
     Represents a 2-dimensional matrix with fast random access.
-    
+
     :attr:`width`
         Matrix width.
-        
+
     :attr:`height`
         Matrix height.
     """
@@ -127,27 +128,27 @@ class Matrix(object):
     def __getitem__(self, pos):
         """
         Return the element at *pos* == (x, y).
-        
+
         Raises IndexError if x or y are not inside the matrix's
         limits.
         """
         x, y = pos
         if not self.valid(pos):
-            raise IndexError, '%s was indexed with x=%s y=%s' % (repr(self),
-                                                                 x, y)
+            raise IndexError('%s was indexed with x=%s y=%s'
+                             % (repr(self), x, y))
         return self.m[y][x]
 
     def __setitem__(self, pos, value):
         """
         Sets the element at *pos* == (x, y) to *value*.
-        
+
         Raises IndexError if x or y are not inside the matrix's
         limits.
         """
         x, y = pos
         if not self.valid(pos):
-            raise IndexError, '%s was indexed with x=%s y=%s' % (repr(self),
-                                                                 x, y)
+            raise IndexError('%s was indexed with x=%s y=%s'
+                             % (repr(self), x, y))
         self.m[y][x] = value
 
     def valid(self, pos):
@@ -160,7 +161,7 @@ class Matrix(object):
     def resize(self, width=None, height=None):
         new_width = self.width if (width is None) else width
         new_height = self.height if (height is None) else height
-        
+
         if height is not None:
             if new_height < self.height:
                 self.m = self.m[:new_height]
@@ -191,22 +192,25 @@ def inverse(direction):
     """
     return {UP: DOWN, DOWN: UP, LEFT: RIGHT, RIGHT: LEFT}[direction]
 
+
 def determine_facing(new_pos, old_pos):
     """
     Returns the direction that has to be followed to get from *old_pos*
     to *new_pos*. Returns None if they are not adjacent.
     """
+
     delta = new_pos - old_pos
     if delta == Position(-1, 0):
         return LEFT
-    elif delta == Position(+1, 0):
+    elif delta == Position(1, 0):
         return RIGHT
     elif delta == Position(0, -1):
         return UP
-    elif delta == Position(0, +1):
+    elif delta == Position(0, 1):
         return DOWN
     else:
         return None
+
 
 def check_direction(key):
     if key in game_config.key_up:
@@ -234,15 +238,15 @@ class IdFactory(object):
     def register(self, _class):
         """
         Register a class-id pair.
-        
+
         *_class* should be the class created when its id is passed
         to fabricate(). It should have id as a class attribute.
         """
         try:
             _class.id
         except AttributeError:
-            raise Exception, 'A class must have an id attribute to be '\
-                             'registered.'
+            raise Exception('A class must have an id attribute to be '
+                            'registered.')
         assert _class.id not in self.classes.keys(), \
                 'id %s already registered' % _class.id
         self.classes[_class.id] = _class
@@ -251,7 +255,7 @@ class IdFactory(object):
         """
         Return a newly created instance of the class registers with the
         given *id*.
-        
+
         If more arguments are passed, they will be forwarded to the
         class constructor.
         """
@@ -271,6 +275,7 @@ def fill_with_surface(target, source):
             x += s_w
         y += s_h
         x = 0
+
 
 def descale_point(pos):
     return (pos[0] / float(graphics_config.scale),

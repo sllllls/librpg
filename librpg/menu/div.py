@@ -1,7 +1,7 @@
 import pygame
 
 from librpg.menu.widget import Widget
-from librpg.menu.navigator import EuclidianNavigator
+
 
 class BoundWidget(object):
 
@@ -27,8 +27,13 @@ class Div(Widget):
             widget.theme = self.theme
         self.widgets.append(BoundWidget(widget, old_theme))
         widget.parent = self
-        widget.position = position
-        
+
+        try:
+            widget.position = position.align_widget(widget, self)
+        except AttributeError:
+            # position is not an Alignment
+            widget.position = position
+
         if self.menu is not None:
             for w in widget.get_tree():
                 if w.menu is not self.menu:
@@ -37,7 +42,7 @@ class Div(Widget):
 
     def remove_widget(self, widget):
         if widget.parent is not self:
-               return False
+            return False
         for w in self.widgets:
             if w.widget is widget:
                 self.widgets.remove(w)
@@ -63,7 +68,7 @@ class Div(Widget):
             y_pos = w.widget.position[1] + y_offset
             surf = w.widget.render(screen, x_pos, y_pos)
 
-    def crystallize(self, widget_navigator=EuclidianNavigator()):
+    def crystallize(self, widget_navigator=None):
         for w in self.widgets:
             w.widget.crystallize(widget_navigator)
 
@@ -75,6 +80,7 @@ class Div(Widget):
 
 
 class WidgetGroup(Div):
+
     def __init__(self, width, height, theme=None):
         Div.__init__(self, width, height, True, theme)
 

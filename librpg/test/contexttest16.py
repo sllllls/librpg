@@ -17,29 +17,32 @@ from librpg.context import Context, get_context_stack
 from librpg.virtualscreen import get_screen
 from librpg.locals import *
 
+
 class ObjectTestNPC(MapObject):
 
     def __init__(self, index):
         MapObject.__init__(self, MapObject.OBSTACLE,
                            image_file='test16_charset.png', image_index=index)
         for dir in [LEFT, DOWN, RIGHT, UP]:
-            self.movement_behavior.movements.extend([Wait(30), ForcedStep(dir)])
+            self.movement_behavior.movements.extend([Wait(30),
+                                                     ForcedStep(dir)])
 
     def activate(self, party_avatar, direction):
         print 'GLOMPed NPC'
         self.map.schedule_message(MessageDialog('GLOMP'))
         self.map.remove_object(self)
 
+
 class ObjectTestRock(ScenarioMapObject):
 
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 11)
-        
+
     def collide_with_party(self, party_avatar, direction):
         if not self.scheduled_movement:
             print 'Pushed rock'
             self.schedule_movement(Slide(direction))
-        
+
     def activate(self, party_avatar, direction):
         if not self.scheduled_movement:
             print 'Grabbed and pulled rock'
@@ -66,7 +69,7 @@ class CounterContext(Context):
         surface = self.font.render("Object#: %d" % (self.amount), True,
                                    dialog_config.font_color)
         get_screen().blit(surface, (20, 20))
-        
+
         surface = self.font.render("Party: (%d, %d)" % (self.party_pos.x,
                                                         self.party_pos.y),
                                    True,
@@ -75,14 +78,14 @@ class CounterContext(Context):
 
 
 class ObjectTestMap(MapModel):
-    
+
     def __init__(self):
         MapModel.__init__(self, 'objecttest16.map',
                           ('test16_lower_tileset.png',
                            'test16_lower_tileset.bnd'),
                           [('test16_upper_tileset.png',
-                            'test16_upper_tileset.bnd'),])
-        
+                            'test16_upper_tileset.bnd'), ])
+
     def initialize(self, local_state, global_state):
         # Add yummy NPCs
         index = 0
@@ -97,6 +100,7 @@ class ObjectTestMap(MapModel):
         # Add counter
         self.object_counter = CounterContext(self)
         self.add_context(self.object_counter)
+
 
 def char_factory(name):
     return librpg.party.Character('Andy', 'test16_charset.png', 3)

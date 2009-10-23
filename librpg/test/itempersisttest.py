@@ -20,15 +20,20 @@ SAVE_FILE = "itempersisttest_save"
 
 item_factory = IdFactory()
 
+
 class LogItem(OrdinaryItem):
+
     id = 'log'
+
     def __init__(self):
         OrdinaryItem.__init__(self, 'Log')
 item_factory.register(LogItem)
 
 
 class LeafItem(OrdinaryItem):
+
     id = 'leaf'
+
     def __init__(self):
         OrdinaryItem.__init__(self, 'Leaf')
 item_factory.register(LeafItem)
@@ -40,7 +45,7 @@ class LogPile(ScenarioMapObject):
 
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 2)
-        
+
     def activate(self, party_avatar, direction):
         added = party_avatar.party.inventory.add_item_by_id('log')
         if added:
@@ -53,13 +58,15 @@ class Tree(ScenarioMapObject):
 
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 23)
-        
+
     def activate(self, party_avatar, direction):
         added = party_avatar.party.inventory.add_item_by_id('leaf')
         if added:
-            self.map.schedule_message(MessageDialog("Got a Leaf."))
+            msg = "Got a Leaf."
         else:
-            self.map.schedule_message(MessageDialog("Inventory full of Leaves."))
+            msg = "Inventory full of Leaves."
+        self.map.schedule_message(msg)
+
 
 class SavePoint(ScenarioMapObject):
 
@@ -72,10 +79,12 @@ class SavePoint(ScenarioMapObject):
         self.map.save_world(SAVE_FILE)
         self.map.schedule_message(MessageDialog('Game saved.',
                                                 block_movement=True))
+
+
 # Map
 
 class PersistTestMap(MapModel):
-    
+
     def __init__(self):
         MapModel.__init__(self, 'itempersisttest.map',
                           (tileset_path('city_lower.png'),
@@ -87,7 +96,7 @@ class PersistTestMap(MapModel):
         self.add_object(LogPile(self), Position(4, 5))
         self.add_object(Tree(self), Position(6, 5))
         self.add_object(SavePoint(self), Position(5, 2))
-        
+
         self.inventory_context = InventoryContext(self)
         self.add_context(self.inventory_context)
 
@@ -95,7 +104,7 @@ class PersistTestMap(MapModel):
 # Party
 
 class TestParty(Party):
-    
+
     def __init__(self, reserve):
         Party.__init__(self, reserve)
         self.inventory = OrdinaryInventory(item_factory)
@@ -117,6 +126,7 @@ def char_factory(name):
                    'Dylan': ('test_chars.png', 2)}
     image_and_index = CHAR_IMAGES[name]
     return Character(name, image_and_index[0], image_and_index[1])
+
 
 def party_factory(reserve):
     return TestParty(reserve)
@@ -151,7 +161,7 @@ class InventoryContext(Context):
             elif event.key in InventoryContext.KEY_TO_CHAR.keys():
                 char = InventoryContext.KEY_TO_CHAR[event.key]
                 if char in self.party.chars:
-                    if (len(self.party.chars) > 1 
+                    if (len(self.party.chars) > 1
                         and self.party.remove_char(char)):
                             msg = 'Removed %s.' % char
                     else:

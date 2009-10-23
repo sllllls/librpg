@@ -8,8 +8,10 @@ import pygame
 from librpg.image import ObjectImage
 from librpg.locals import *
 
+
 def default_party_factory(reserve):
     return Party(reserve)
+
 
 class Party(object):
 
@@ -20,7 +22,7 @@ class Party(object):
     def __init__(self, reserve):
         """
         Initialize a party that takes characters from a CharacterReserve.
-        
+
         :attr:`capacity`
             Maximum number of characters in the Party.
 
@@ -64,7 +66,7 @@ class Party(object):
         if leader is not None:
             self.leader = leader
         self.custom_init()
-        
+
     def add_char(self, name):
         """
         Insert a Character in the Party.
@@ -138,12 +140,13 @@ class Party(object):
     def get_image(self, avatar):
         """
         Return the image to represent the Party on the map.
-        
+
         *avatar* does not need to be specified, unless a class derived from
         Party wants to have an image that depends on it and overloads
         this function.
         """
-        assert self.leader is not None, 'A Party with no characters may not be \
+        assert self.leader is not None, 'A Party with no characters may not \
+                                         be \
                                         displayed'
         return self.get_char(self.leader).image
 
@@ -154,7 +157,7 @@ class Party(object):
     def custom_save(self):
         """
         *Virtual.*
-        
+
         Return a serializable local state to store the party's
         information.
         """
@@ -168,25 +171,25 @@ class Party(object):
         self.capacity = data[0]
         self.chars = data[1]
         self.set_leader(data[2])
-        
+
         self.custom_load(party_state[1])
 
     def custom_load(self, party_state):
         """
         *Virtual.*
-        
+
         Initialize whatever fields depend on the state that was saved in a
         previous game.
 
-        *party_state* is the local state returned by save_state() when the state
-        was saved.
+        *party_state* is the local state returned by save_state() when the
+        state was saved.
         """
         pass
 
     def custom_init(self):
         """
         *Virtual.*
-        
+
         Initial config whatever attributes would be normally loaded from
         a save file.
 
@@ -212,10 +215,10 @@ class CharacterReserve(object):
                  party_factory=default_party_factory):
         """
         *Constructor.*
-        
+
         *character_factory* that, given a character name, returns an
         instance of that character.
-        
+
         *party_factory* should be a factory function that returns an
         instance of Party or some derived class, given a reserve. This
         defaults to the base Party constructor.
@@ -248,7 +251,7 @@ class CharacterReserve(object):
     def add_char(self, name, char_state=None):
         """
         Add a Character to the reserve.
-        
+
         *name* should be the character's name. If the character is
         supposed to be newly crated, *char_state* should be None.
         If it is being loaded, *char_state* should be a serializable
@@ -264,12 +267,12 @@ class CharacterReserve(object):
     def remove_char(self, name):
         """
         Remove a character from the reserve.
-        
+
         *name* should be the character's name.
-        
+
         Return the Character if he was in the reserve, None otherwise.
         """
-        if self.chars.has_key(name):
+        if name in self.chars:
             char = self.chars[name]
             if self.party_allocation[name] is not None:
                 self.party_allocation[name].remove_char(name)
@@ -293,7 +296,8 @@ class CharacterReserve(object):
 
     def _allocate_char(self, name, party):
         assert name in self.get_names(), 'Character is not in reserve'
-        assert party is None or party in self.parties, 'Party is not in reserve'
+        assert party is None or party in self.parties, 'Party is not in \
+                                                        reserve'
         self.party_allocation[name] = party
 
     def set_default_party(self, party):
@@ -341,11 +345,11 @@ class CharacterReserve(object):
         for party in self.parties:
             result[PARTIES_LOCAL_STATE].append(party.save_state())
         return result
-    
+
     def load_state(self, state):
-        assert state.has_key(CHARACTERS_LOCAL_STATE), 'State does not have '\
+        assert CHARACTERS_LOCAL_STATE in state, 'State does not have '\
                'character information.'
-        assert state.has_key(CHARACTERS_LOCAL_STATE), 'State does not have '\
+        assert PARTIES_LOCAL_STATE in state, 'State does not have '\
                'party information.'
         for name, char_state in state[CHARACTERS_LOCAL_STATE].iteritems():
             self.add_char(name, char_state)
@@ -362,8 +366,8 @@ class Character(object):
 
     """
     A Character is a person that composes player controlled parties.
-    
-    Typically Characters will walk in maps organized in parties - 
+
+    Typically Characters will walk in maps organized in parties -
     possibly a 1-Character party -, engage in battle and so on. They
     can be removed and added to parties. Typically parties have a
     limited number of Characters, such that only a couple can be picked
@@ -373,7 +377,7 @@ class Character(object):
     def __init__(self, name, image_file=None, index=0):
         """
         *Constructor.*
-        
+
         Specify the *name* of the character, the name of the *image_file*
         where the character's sprites are, and the *index* by which the
         sprites can be found in the object image file.
@@ -404,7 +408,7 @@ class Character(object):
     def custom_save(self):
         """
         *Virtual.*
-        
+
         Return a serializable local state to store the character's
         information.
         """
@@ -420,7 +424,7 @@ class Character(object):
     def custom_load(self, char_state=None):
         """
         *Virtual.*
-        
+
         Initialize whatever fields depend on the state that was saved in a
         previous game.
 
