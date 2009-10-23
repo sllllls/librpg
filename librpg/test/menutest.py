@@ -3,9 +3,11 @@ from pygame import *
 
 import librpg
 from librpg.menu import (MenuController, Menu, Panel, Label, ArrowCursor,
-                         ImageWidget, WidgetGroup, Bar, VerticalGrid)
+                         ImageWidget, WidgetGroup, Bar, VerticalGrid,
+                         AlignCenter, AlignTopLeft)
 from librpg.context import get_context_stack
 from librpg.path import data_path
+
 
 class MenuLabel(Label):
 
@@ -39,7 +41,7 @@ class AdjustableVerticalGrid(VerticalGrid):
         self.max_height = max_height
         for i in range(height_in_cells):
             label = Label('SidePanel%d' % i)
-            self[i].add_widget(label, (20, 10))
+            self[i].add_widget(label, AlignCenter())
 
     def process_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
@@ -53,7 +55,7 @@ class AdjustableVerticalGrid(VerticalGrid):
             i = self.height_in_cells
             self.add_lines()
             label = Label('SidePanel%d' % i)
-            self[i].add_widget(label, (20, 10))
+            self[i].add_widget(label, AlignCenter())
 
     def remove_line(self):
         if self.height_in_cells > 1:
@@ -66,10 +68,10 @@ class TestMenu(Menu):
         Menu.__init__(self, 400, 300)
         self.panel = Panel(200, 150)
         self.add_widget(self.panel, (40, 80))
-        
+
         self.add_widget(MenuLabel(), (90, 20))
         self.add_widget(Label('NonFocusable', focusable=False), (150, 20))
-        
+
         first_panel_label = Label('Panel0')
         self.panel.add_widget(first_panel_label, (40, 20))
         self.panel.add_widget(Label('Panel1'), (120, 20))
@@ -81,17 +83,18 @@ class TestMenu(Menu):
         side_panel = Panel(110, 220)
         self.add_widget(side_panel, (260, 40))
 
-        grid = AdjustableVerticalGrid(110, 74, 2, 6)
-        side_panel.add_widget(grid, (0, 0))
+        grid = AdjustableVerticalGrid(110, 72, 2, 6)
+        side_panel.add_widget(grid, AlignTopLeft())
 
         img = pygame.image.load(data_path('icon.png'))
+        #img = pygame.image.load(data_path('test.png'))
         self.add_widget(ImageWidget(img), (8, 8))
 
         group = WidgetGroup(148, 20)
         group.add_widget(Label('Group0'), (10, 0))
         group.add_widget(Label('Group1'), (90, 0))
         self.add_widget(group, (60, 240))
-        
+
         #self.crystallize()
 
         # Add cursor
@@ -108,4 +111,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

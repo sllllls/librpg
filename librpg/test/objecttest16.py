@@ -17,13 +17,15 @@ from librpg.movement import Slide, Wait, ForcedStep
 from librpg.dialog import MessageDialog
 from librpg.locals import *
 
+
 class ObjectTestNPC(MapObject):
 
     def __init__(self, index):
         MapObject.__init__(self, MapObject.OBSTACLE,
                            image_file='test16_charset.png', image_index=index)
         for dir in [LEFT, DOWN, RIGHT, UP]:
-            self.movement_behavior.movements.extend([Wait(30), ForcedStep(dir)])
+            self.movement_behavior.movements.extend([Wait(30),
+                                                     ForcedStep(dir)])
 
     def activate(self, party_avatar, direction):
         print 'GLOMPed NPC'
@@ -35,12 +37,12 @@ class ObjectTestRock(ScenarioMapObject):
 
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 11)
-        
+
     def collide_with_party(self, party_avatar, direction):
         if not self.scheduled_movement:
             print 'Pushed rock'
             self.schedule_movement(Slide(direction))
-        
+
     def activate(self, party_avatar, direction):
         if not self.scheduled_movement:
             print 'Grabbed and pulled rock'
@@ -51,7 +53,7 @@ class ObjectTestRock(ScenarioMapObject):
 
 
 class ObjectTestMap(MapModel):
-    
+
     def __init__(self):
         MapModel.__init__(self, 'objecttest16.map',
                           ('test16_lower_tileset.png',
@@ -65,8 +67,9 @@ class ObjectTestMap(MapModel):
             for j in range(3, 1, -1):
                 self.add_object(ObjectTestNPC(index), Position(i, j))
                 index = (index + 1) % 8
-                
+
         self.add_object(ObjectTestRock(self), Position(7, 2))
+
 
 def char_factory(name):
     return librpg.party.Character('Andy', 'test16_charset.png', 3)

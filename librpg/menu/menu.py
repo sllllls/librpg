@@ -9,6 +9,7 @@ from librpg.locals import *
 
 from librpg.menu.div import Div
 
+
 class Menu(Div):
 
     MOUSE_OFF = 0
@@ -161,7 +162,7 @@ class MenuController(Context):
             return
 
         pos = descale_point(event.pos)
-        
+
         if self.menu.mouse_control == Menu.MOUSE_STRICT:
             if cursor.widget.contains_point(pos):
                 return
@@ -178,4 +179,3 @@ class MenuController(Context):
                         best = (w, dist)
             if best[0] is not None:
                 cursor.move_to(best[0])
-

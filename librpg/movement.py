@@ -4,11 +4,12 @@ a MapObject's movements. These can be used both for one-time movement
 or for routine movement.
 """
 
+
 class Movement(object):
 
     """
     Movements are instructions for a MapObject to move.
-    
+
     Movements can be used on a MapObject in two ways: one is to push them
     to the object's movement queue, which will make the object execute it
     once, as soon as the others that are already in progress or enqueued
@@ -19,14 +20,14 @@ class Movement(object):
     def flow(self, obj):
         """
         *Abstract.*
-        
+
         Manipulate the object to have it moved.
-        
+
         Return True if the Movement is done and the next can be executed (right
         after the MapObject's *movement_phase* becomes 0, that is, the object
         stops. Return False if it requires more flow() calls to complete.
         """
-        raise NotImplementedError, 'Movement.flow() is abstract'
+        raise NotImplementedError('Movement.flow() is abstract')
 
 
 class MovementQueue(Movement, list):
@@ -36,11 +37,11 @@ class MovementQueue(Movement, list):
     executed. To fill it, either pass a list in its *contents* parameter
     with the intended contents or append/extend Movements to it like
     any other list.
-    
+
     MovementQueues may be inserted in MovementQueues, and will execute all
     their contents before yielding control.
     """
-    
+
     def __init__(self, contents=None):
         list.__init__(self)
         if contents:
@@ -68,14 +69,14 @@ class MovementCycle(Movement):
     A MovementCycle holds Movements that are routinely executed. The
     Movements are not removed from it when executed, but just passed,
     and when the end of the MovementCycle is reached, it starts over.
-    
+
     To fill it, either pass a list in its *contents* parameter
     with the intended contents or append/extend Movements to it like
     any other list.
-    
+
     MovementCycles never yield control.
     """
-    
+
     def __init__(self, contents=None):
         if contents is not None:
             self.movements = contents
@@ -98,7 +99,7 @@ class OneTileMovement(Movement):
     """
     Base class for one tile movements.
     """
-    
+
     def __init__(self, direction, slide, back, tries):
         """
         *Constructor.*
@@ -120,7 +121,8 @@ class OneTileMovement(Movement):
             self.tries_left = tries
 
     def flow(self, obj):
-        done = obj.map.try_to_move_object(obj, self.direction, slide=self.slide,
+        done = obj.map.try_to_move_object(obj, self.direction,
+                                          slide=self.slide,
                                           back=self.back)
         if self.forced:
             return (done,)
@@ -136,7 +138,7 @@ class Step(OneTileMovement):
     """
     Tries to make the object take one step to *direction*. Yields
     control after the step worked or after *tries* frames have passed.
-    
+
     If *back* is True, the step will be backwards.
     """
 
@@ -214,12 +216,12 @@ class ForcedSlide(OneTileMovement):
 
 import starA
 class PathMovement(Movement):
+
     def __init__(self, mapmodel, obj, dest):
-        self.mapmodel = mapmode
-        self.dest     = dest   
-        
+        self.mapmodel = mapmodel
+        self.dest     = dest    
+
     def flow(self, obj):
-        
         v = starA.StarA(self.mapmodel, obj.postion, self.dest)
         
         if v:
@@ -227,4 +229,3 @@ class PathMovement(Movement):
             return (False,)
         else:
             return (True,)
-            

@@ -1,16 +1,17 @@
 import pygame
 
+
 class ScaledScreen(pygame.Surface):
     """
     The ScaledScreen is a replacement for the Pygame display surface.
     It has the blit() and flip() methods, behaving like the display,
     except it scales whatever is blitted to it to the number configured
     thought *graphics_config*.
-    
+
     The singleton ScaledScreen may be obtained by calling the
     *librpg.virtualscreen.get_screen()* function. The result will be a
     handle to it, which can be blitted on.
-    
+
     This is especially important to implement the draw() methods of
     Contexts that display objects on the screen.
     """
@@ -59,12 +60,13 @@ class VirtualScreen(object):
         self.init_real_screen(real_screen_dimensions, display_mode)
         self.init_virtual_screen(screen_dimensions, scale)
 
-
 screen_container = VirtualScreen()
+
 
 def init(real_screen_dimensions, display_mode, screen_dimensions, scale):
     screen_container.create_screen(real_screen_dimensions, display_mode,
                                    screen_dimensions, scale)
+
 
 def get_screen():
     """
@@ -72,4 +74,3 @@ def get_screen():
     except it is scaled as configured in *graphics_config*.
     """
     return screen_container.screen
-

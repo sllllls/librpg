@@ -20,7 +20,7 @@ class QuestBook(dict):
         quest = self.factory.fabricate(quest_id, *([self.owner] + list(args)))
         self[quest_id] = quest
         quest.book = self
-        
+
         quest.start()
 
     def get_quests(self):
@@ -38,8 +38,8 @@ class Quest(object):
         try:
             self.id
         except AttributeError:
-            raise Exception, 'Classes derived from Quest must have an id as'\
-                             'class attribute'
+            raise Exception('Classes derived from Quest must have an id as'\
+                            'class attribute')
 
         self.owner = owner
         self.name = name
